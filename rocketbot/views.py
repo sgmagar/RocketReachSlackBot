@@ -79,16 +79,25 @@ class CommandView(SlackMixin, View):
 
     @csrf_exempt
     def dispatch(self, request, *args, **kwargs):
-        if request.method == 'GET':
-            return HttpResponse(status=403, content=b"GET request is not allowed.")
-        return super().dispatch(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
         token = request.POST.get("token")
         if token != self.verification_token:
             logging.warning("Incorrect token received.")
             return HttpResponse(status=403, content=b"Token does not match.")
+        self.data = request.POST
+        return super().dispatch(request, *args, **kwargs)
 
-        data = {'text': 'Testing of rocket command success'}
+    def post(self, request, *args, **kwargs):
+        command = self.data['command'].strip('/')
+        try:
+            method = getattr(self, f'{command}_command')
+        except AttributeError:
+            logging.info(f'Unhandled command {command}')
+            return HttpResponse(status=200)
+        return method()
+
+    def rocket_command(self):
+        text = self.data['text'].strip()
+        data = {'text': f'Testing of rocket command success and your keywords are {text}'}
         return JsonResponse(data)
+
 

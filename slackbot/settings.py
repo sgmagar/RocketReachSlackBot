@@ -152,4 +152,6 @@ ROCKET_APP = {
         "verification_token": env.str('ROCKETAPP_VERIFICATION_TOKEN', '')
     }
 
+ROCKETREACH_API_KEY = env.str('ROCKETREACH_API_KEY', '')
+
 
