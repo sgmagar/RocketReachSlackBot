@@ -2,6 +2,8 @@ import logging
 import os
 from urllib.parse import urlencode
 
+import requests
+from django.conf import settings
 from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -95,9 +97,55 @@ class CommandView(SlackMixin, View):
             return HttpResponse(status=200)
         return method()
 
-    def rocket_command(self):
+    def linkedin_command(self):
         text = self.data['text'].strip()
-        data = {'text': f'Testing of rocket command success and your keywords are {text}'}
-        return JsonResponse(data)
+        params = {'li_url': text}
+        response = rocketreach_api_call('/lookupProfile', params)
+        if not isinstance(response, list):
+            return JsonResponse({'text': "No Profile on `RocketReach`" })
+        profile = response[0]
+        attachments = get_attachments(profile)
+        message = {
+            'text': f"This is the profile of `{profile['name']}`",
+            'attachments': attachments
+        }
+        return JsonResponse(message)
 
 
+def rocketreach_api_call(url, params={}):
+    base_url = 'https://api.rocketreach.co/v1/api'
+    query_json = {
+        'api_key': settings.ROCKETREACH_API_KEY
+    }
+    query_json.update(params)
+    query = urlencode(query_json)
+    url = f'{base_url}{url}?{query}'
+    response = requests.get(url)
+    return response.json()
+
+
+def get_attachments(profile):
+    attachment = {
+        "color": "#aaefab",
+        "title": f"{profile['name']}",
+        "title_link": f"{profile['links'].get('linkedin')}",
+        "thumb_url": f"{profile['profile_pic']}",
+        "fields": [
+            {
+                "title": "Current Work Email",
+                "value": f"{profile['current_work_email']}",
+                "short": False
+            },
+            {
+                "title": "Facebook Profile",
+                "value": f"{profile['links'].get('facebook') or 'No Facebook Account'}",
+                "short": False
+            },
+            {
+                "title": "Twitter Profile",
+                "value": f"{profile['links'].get('twitter') or 'No Twitter Account'}",
+                "short": False
+            }
+        ],
+    }
+    return [attachment]
