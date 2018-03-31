@@ -1,0 +1,12 @@
+{% extends "rocketbot/__base.html" %}
+{% block content %}
+    <h1>Oauth Callback</h1>
+
+    <div>
+        {% if error %}
+            {{ error }}
+        {% else %}
+            Successfully installed slack app.
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% block extra_meta %}{% endblock %}
+    <title>{{title}} | Rocket Reach Bot</title>
+    <style>
+        #main {
+            max-width: 80%;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+{% block content %}
+{% endblock %}
+</div>
+</body>
+</html>
