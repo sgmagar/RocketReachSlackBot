@@ -2,7 +2,7 @@ import logging
 import os
 from urllib.parse import urlencode
 
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -89,5 +89,6 @@ class CommandView(SlackMixin, View):
             logging.warning("Incorrect token received.")
             return HttpResponse(status=403, content=b"Token does not match.")
 
-        return {'text': 'Testing of rocket command success'}
+        data = {'text': 'Testing of rocket command success'}
+        return JsonResponse(data)
 
