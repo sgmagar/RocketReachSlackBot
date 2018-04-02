@@ -121,6 +121,7 @@ def rocketreach_api_call(url, params={}):
     query = urlencode(query_json)
     url = f'{base_url}{url}?{query}'
     response = requests.get(url)
+    logging.info(response)
     return response.json()
 
 
