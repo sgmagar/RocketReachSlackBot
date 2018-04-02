@@ -99,6 +99,8 @@ class CommandView(SlackMixin, View):
 
     def linkedin_command(self):
         text = self.data['text'].strip()
+        if not '//www' in text:
+            text = text.replace('//', '//www')
         params = {'li_url': text}
         response = rocketreach_api_call('/lookupProfile', params)
         if not isinstance(response, list):
